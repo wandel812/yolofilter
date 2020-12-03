@@ -1,6 +1,6 @@
 .vscode/*
-filtered/*
-TW
-obj.data
-obj.names
-train.txt
+train/*
+valid/*
+test/*
+ftrain/*
+*.code-workspace
