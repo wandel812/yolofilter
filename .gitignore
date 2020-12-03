@@ -1,0 +1,6 @@
+.vscode/*
+filtered/*
+TW
+obj.data
+obj.names
+train.txt
