@@ -6,7 +6,8 @@
     - place data directory named TW in the same directory where the script is
     - create filter.cfg file and fill it with ids separated by space
 
-    The result will be placed in ./filtered directory 
+    The result will be placed in ./filtered directory by default. 
+    All of *.txt data it contains will be cleared
 """
 
 import glob 
@@ -21,14 +22,14 @@ config = 'filter.cfg'
 
 def script_run():
     options = parse_args()
-    prepare_dirs(os.path.join(filtdir, options.input), fpattern)  
+    prepare_dirs(os.path.join(options.output, options.input), fpattern)  
 
     files = glob.glob(os.path.join(options.input,fpattern))
     ids = get_ids(options.conf)
     for file in files:
         filtredlines = filter_file(file, ids)    
         if options.allfiles or filtredlines:
-            filepath = os.path.join(filtdir, file)
+            filepath = os.path.join(options.output, file)
             write_file(filepath, filtredlines)
 
 
