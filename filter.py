@@ -36,8 +36,12 @@ def script_run():
     screenshots = glob.glob(os.path.join(options.input, jpgpattern))
     for screenshot in screenshots:
         print(f'copy: {screenshot}')
-        shutil.copyfile(screenshot, 
-                        os.path.join(options.output, os.path.split(screenshot)[1]))
+        try:
+            shutil.copyfile(screenshot, 
+                os.path.join(options.output, os.path.split(screenshot)[1]))
+        except shutil.SameFileError:
+            print(f'didnt copy. The same file {screenshot}')
+
 
 def parse_args(args=sys.argv[1:]):
     parser = argparse.ArgumentParser(
