@@ -68,9 +68,17 @@ def write_file(file, lines):
         foutput.write("".join(lines))
 
 def get_ids(file):
+    def is_number(s):
+        try:
+            int(s)
+            return True
+        except:
+            return False
+
     res = []
     with open(file, "r") as finput:
-        res = finput.readline().split(" ")
+        arr = finput.readline().split(" ")
+        res = list(filter(lambda x: is_number(x), arr))
     return res
 
 def write_labelfile(input, output, ids):
