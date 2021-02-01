@@ -1,14 +1,15 @@
 """Filter trained weight data by id
-    The script filters TW data by id. Input directory contains TW data
-    The result is saved in output directory. Id list can be found in filter.cfg
-    that should be placed in the script directory
+    The script filters TW data by id. Input directory contains TW data:
+    label file and set of pairs: geometry-file and screenshot.
+    The result is saved in output directory. Id list can be found in filter.cfg.
+    filter.cfg file must contain one line of ids divided by spaces.
 
-    All of *.txt files in output will be overwritten respectevly by their input names
+    All of *.txt files in output will be overwritten respectively by their input names
 """
 
-import glob 
+import glob
 import argparse
-import os 
+import os
 import sys
 import shutil
 
@@ -17,16 +18,17 @@ jpgpattern = '*.jpg'
 config = 'filter.cfg'
 labelfile = '_darknet.labels'
 
+
 def script_run():
     options = parse_args()
     os.makedirs(options.output, exist_ok=True)
 
     files = glob.glob(os.path.join(options.input, txtpattern))
     ids = get_ids(options.conf)
-    idold_to_idcur = write_labelfile(os.path.join(options.input, labelfile), 
-        os.path.join(options.output, labelfile), ids)
+    idold_to_idcur = write_labelfile(os.path.join(options.input, labelfile),
+                                     os.path.join(options.output, labelfile), ids)
     for file in files:
-        lines = filter_file(file, ids)    
+        lines = filter_file(file, ids)
         lines = rewrite_ids(lines, idold_to_idcur)
         if not options.onlyfilled or lines:
             filepath = os.path.join(options.output, os.path.split(file)[1])
@@ -37,8 +39,8 @@ def script_run():
     for screenshot in screenshots:
         print(f'copy: {screenshot}')
         try:
-            shutil.copyfile(screenshot, 
-                os.path.join(options.output, os.path.split(screenshot)[1]))
+            shutil.copyfile(screenshot,
+                            os.path.join(options.output, os.path.split(screenshot)[1]))
         except shutil.SameFileError:
             print(f'didnt copy. The same file {screenshot}')
 
@@ -54,6 +56,7 @@ def parse_args(args=sys.argv[1:]):
 
     return parser.parse_args(args)
 
+
 def filter_file(file, ids):
     lines = []
     with open(file) as finput:
@@ -61,11 +64,13 @@ def filter_file(file, ids):
             id = line.split(' ')[0]
             if id in ids:
                 lines.append(line)
-    return lines     
+    return lines
+
 
 def write_file(file, lines):
     with open(file, "w") as foutput:
         foutput.write("".join(lines))
+
 
 def get_ids(file):
     def is_number(s):
@@ -81,6 +86,7 @@ def get_ids(file):
         res = list(filter(lambda x: is_number(x), arr))
     return res
 
+
 def write_labelfile(input, output, ids):
     # create dict label's id to name from source label file
     idtoname_old = {}
@@ -92,9 +98,9 @@ def write_labelfile(input, output, ids):
             idtoname_old[n] = label
             nametoid_old[label] = n
             n += 1
-    
+
     # create name to id from config file
-    idtoname_cur = {} 
+    idtoname_cur = {}
     n = 0
     for id in ids:
         idtoname_cur[n] = idtoname_old[int(id)]
@@ -104,19 +110,21 @@ def write_labelfile(input, output, ids):
     idold_to_idcur = {}
     for i in range(len(ids)):
         idold_to_idcur[nametoid_old[idtoname_cur[i]]] = i
-    
+
     # write new label to file
     with open(output, "w") as out:
         out.write("\n".join(idtoname_cur[i] for i in range(len(ids))))
 
     return idold_to_idcur
 
+
 def rewrite_ids(lines, idold_to_idcur):
     for i in range(len(lines)):
         words = lines[i].split(' ')
-        words[0] = f"{idold_to_idcur[int(words[0])]} "
-        lines[i] = "".join(words)
+        words[0] = f"{idold_to_idcur[int(words[0])]}"
+        lines[i] = " ".join(words)
     return lines
+
 
 if __name__ == "__main__":
     script_run()
